@@ -1,0 +1,96 @@
+to do
+
+1. make edit button as a link so we can traverse through it.
+	like : <a href = '/edit/{{post.sno}}'>  ==>/edit/1
+
+2. Enter a edit route in main.py
+	code for:
+		check that admin is already logged in:
+			if user in session and session['user'] == admin
+				if request.method is post
+					to post k saare parameters lelo
+						box_title = request.form.get('title')
+						tline
+						slug
+						content
+						img_file
+						date = datetime.now()
+						### for adding
+						if sno == '0':
+							post = Posts(title = box_title, slug = slug, tagline = tline, content = content, img_file = img_file, date = date)
+							db.session.add(post)
+							db.session.commit()
+						### if not adding but need tot edit existing
+						else:
+							post = Posts.query.filter_by(sno = sno).first()
+							post.title = box_title
+							post.slug = slug
+							post.tagline = tline
+							post.content = content
+							post.img_file = img_file
+							post.date = datetime.now()
+							db.session.commit()
+							return redirect('/edit/'+sno)
+						
+				post = Posts.query.filter_by(sno = sno).first()
+				render_template('edit.html', params = params, post = post)	
+					
+#### to edit/0 pr ja kr k apn add kr skte hai
+					
+					
+3. creating an file --> edit.html
+	copy paste cotact.html coz we need a form also
+	in form having fields:
+		box_title, tline, slug, content, img_file 
+		
+4. then write else part for editing existing post
+5. import redirect
+6. edit.html me cvalue bhi add krenge thn dekhenge ya db se wo sb values utha kr layenge 
+	like: value = "{{post.content}}"
+	to fir ye sb form m aajayega edit hone k liye
+7. edit me do button add krna hai basic actions m 1.Dashboard home 2. logout
+8. dashboard me logout button or add kr denge or uska end point logout kr denge 
+
+
+##############################################################
+To create a file uploader in dashboard.html
+
+1. input file lenge
+	==> <form action = "/uploader" method = 'post' enctype="multipart/form-data">
+		<input type = 'file' name = "file1">
+		submit button
+		</form>
+		
+2. in config add new variable upload_location : give a path to blog website folder upto static folder
+
+3. create a new route name : uploader
+ check the user is already signed in or not
+	thn check that request.method = 'post'
+		f = request.files('file1')
+		f.save(os.path.join(app.config[''UPLOAD_FOLDER]), secure file_name(f.filename))
+		return "Uploaded succrssfully"
+		
+		
+TO use os module import it, thn write app.conig['UPLOAD_FOLDER'] =  params['upload_location']
+secure_filename ek function hoata hai werkzeug module me to insko import krenge : from werkzeug import secure_filename
+
+then it works or uplpoad file successfully
+
+$. to crate logout :
+	create a route of logout
+		session.pop('user')
+		return redirect('/dashboard')
+
+############################################################################
+TO delete post from dashboard
+so enter <a href = "/delete/{{post.sno}}"><button class= "bt btn-primary">Delete</button></a>
+
+from main:
+ create another route name delete
+ @app.route('/delete/<string:sno>', methods=['GET', 'POST'])
+ def delete(sno):
+	check that log in user is admin or not
+		post = Posts.query.filter_by(sno = sno).first()
+		db.sessin.delete(post)
+		db.session.commit()
+	return redirect('/dashboard')
